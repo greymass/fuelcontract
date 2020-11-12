@@ -88,8 +88,8 @@ public:
 
         double amount = quantity.amount / pow(10, quantity.symbol.precision());
 
-        std::size_t ref_pos = memo.rfind("ref=");
-        if (ref_pos != std::string::npos) {
+        size_t ref_pos = memo.rfind("ref=");
+        if (ref_pos != string::npos) {
             auto account = name(memo.substr(ref_pos + 4, memo.length()));
             double ref_amount = amount * config.referral_reward;
             update_balance(account, ref_amount);
