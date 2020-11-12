@@ -6,3 +6,7 @@ fuel.wasm: fuel.cpp fuel.contracts.md
 .PHONY: format
 format:
 	clang-format --style=WebKit -i fuel.cpp
+
+.PHONY: clean
+clean:
+	rm fuel.wasm fuel.abi
