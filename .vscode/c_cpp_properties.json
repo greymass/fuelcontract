@@ -1,0 +1,22 @@
+{
+    "configurations": [
+        {
+            "name": "Mac",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "/usr/local/opt/eosio.cdt/opt/eosio.cdt/include",
+                "/usr/local/opt/eosio.cdt/opt/eosio.cdt/include/libc",
+                "/usr/local/opt/eosio.cdt/opt/eosio.cdt/include/libcxx",
+                "/usr/local/opt/eosio.cdt/opt/eosio.cdt/include/eosiolib/contracts",
+                "/usr/local/opt/eosio.cdt/opt/eosio.cdt/include/eosiolib/core"
+            ],
+            "defines": [],
+            "macFrameworkPath": [],
+            "compilerPath": "/usr/local/bin/eosio-cpp",
+            "cStandard": "gnu17",
+            "cppStandard": "gnu++14",
+            "intelliSenseMode": "clang-x64"
+        }
+    ],
+    "version": 4
+}
