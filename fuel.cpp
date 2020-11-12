@@ -44,6 +44,7 @@ public:
     [[eosio::action]] void configure(config config)
     {
         require_auth(_self);
+        check(config.referral_reward > 0 && config.referral_reward < 1, "referral reward must be fraction between 0 and 1");
         _config.set(config, _self);
     }
 
