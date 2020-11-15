@@ -80,22 +80,22 @@ public:
             return;
         }
 
-        auto config = _config.get();
-
-        check(quantity.is_valid(), "invalid fee");
-        check(quantity.symbol == config.token_symbol, "invalid fee");
-        check(quantity.amount > 0, "invalid fee");
-
-        double amount = quantity.amount / pow(10, quantity.symbol.precision());
-
         size_t ref_pos = memo.rfind("ref=");
         if (ref_pos != string::npos) {
+            auto config = _config.get();
+
+            check(quantity.is_valid(), "invalid fee");
+            check(quantity.symbol == config.token_symbol, "invalid fee");
+            check(quantity.amount > 0, "invalid fee");
+
+            double amount = quantity.amount / pow(10, quantity.symbol.precision());
+
             auto account = name(memo.substr(ref_pos + 4, memo.length()));
             double ref_amount = amount * config.referral_reward;
             update_balance(account, ref_amount);
             amount -= ref_amount;
+            update_balance(config.fee_account, amount);
         }
-        update_balance(config.fee_account, amount);
     }
 
     void update_balance(name account, double amount)
