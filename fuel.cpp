@@ -1,3 +1,9 @@
+// workaround for eosio.cdt missing bits/endian.h in libc includes
+#ifndef __BYTE_ORDER__
+#warning "Manually setting endianness"
+#define __BYTE_ORDER__ __ORDER_LITTLE_ENDIAN__
+#endif
+
 #include <cmath>
 #include <eosio/asset.hpp>
 #include <eosio/eosio.hpp>
@@ -23,7 +29,7 @@ public:
         symbol token_symbol;
         double referral_reward;
     };
-    typedef singleton<name("config"), config> config_type;
+    typedef singleton<"config"_n, config> config_type;
     config_type _config;
 
     struct [[eosio::table]] user {
@@ -31,7 +37,7 @@ public:
         double balance;
         uint64_t primary_key() const { return account.value; }
     };
-    typedef eosio::multi_index<name("users"), user> users;
+    typedef eosio::multi_index<"users"_n, user> users;
     users _users;
 
     fuel(name receiver, name code, datastream<const char*> ds)
