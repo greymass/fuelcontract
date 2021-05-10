@@ -40,10 +40,35 @@ public:
     typedef eosio::multi_index<"users"_n, user> users;
     users _users;
 
+    struct [[eosio::table]] pool {
+        /** Pool name, e.g. "mtgox1" */
+        name pool_name;
+        /** Display name of the pool, e.g. "Mt. Gox - SafetyPool #1" */
+        string display_name;
+        /** Owner account name. */
+        name owner;
+        /** Number of credits available. */
+        int64_t credits;
+        /** Account filters. */
+        vector<string> accounts;
+        /** Action include filters. */
+        vector<string> include;
+        /** Action exclude filters. */
+        vector<string> exclude;
+        /** How many credits per account and day the pool can spend. */
+        int64_t daily_quota;
+
+        uint64_t primary_key() const { return pool_name.value; }
+        uint64_t by_owner() const { return owner.value; }
+    };
+    typedef multi_index<"pools"_n, pool, indexed_by<"byowner"_n, const_mem_fun<pool, uint64_t, &pool::by_owner>>> pools;
+    pools _pools;
+
     fuel(name receiver, name code, datastream<const char*> ds)
         : contract(receiver, code, ds)
         , _users(_self, _self.value)
         , _config(_self, _self.value)
+        , _pools(_self, _self.value)
     {
     }
 
@@ -77,6 +102,61 @@ public:
                 .quantity = quantity,
                 .memo = "Referral reward from Greymass Fuel" } }
             .send();
+    }
+
+    /** Create a new credits pool. */
+    [[eosio::action]] void createpool(name pool_name, name owner)
+    {
+        require_auth(owner);
+        check(pool_name.value > 5, "invalid pool name");
+        check(_pools.find(pool_name.value) == _pools.end(), "pool with that name already exists");
+        _pools.emplace(owner, [&](pool& pool) {
+            pool.pool_name = pool_name;
+            pool.owner = owner;
+        });
+    }
+
+    /** Configure a credits pool. */
+    [[eosio::action]] void updatepool(
+        name pool_name,
+        optional<string> display_name,
+        optional<vector<string>> accounts,
+        optional<vector<string>> include,
+        optional<vector<string>> exclude,
+        optional<int64_t> daily_quota)
+    {
+        auto itr = _pools.find(pool_name.value);
+        check(itr != _pools.end(), "no such pool");
+        require_auth(itr->owner);
+        _pools.modify(itr, itr->owner, [&](pool& pool) {
+            if (display_name.has_value()) {
+                pool.display_name = *display_name;
+                check(pool.display_name.length() < 40, "display name too long");
+                check(pool.display_name.find_first_not_of("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890 %(),.:") == string::npos, "invalid character in display name");
+            }
+            if (accounts.has_value()) {
+                pool.accounts = *accounts;
+            }
+            if (include.has_value()) {
+                pool.include = *include;
+            }
+            if (exclude.has_value()) {
+                pool.exclude = *exclude;
+            }
+            if (daily_quota) {
+                pool.daily_quota = *daily_quota;
+                check(pool.daily_quota >= 0, "daily quota must not be negative");
+            }
+        });
+    }
+
+    /** Remove a credits pool. */
+    [[eosio::action]] void removepool(name pool_name)
+    {
+        auto itr = _pools.find(pool_name.value);
+        check(itr != _pools.end(), "no such pool");
+        require_auth(itr->owner);
+        _pools.erase(itr);
     }
 
     [[eosio::on_notify("eosio.token::transfer")]] void on_transfer(
