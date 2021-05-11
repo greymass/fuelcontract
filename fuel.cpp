@@ -119,34 +119,24 @@ public:
     /** Configure a credits pool. */
     [[eosio::action]] void updatepool(
         name pool_name,
-        optional<string> display_name,
-        optional<vector<string>> accounts,
-        optional<vector<string>> include,
-        optional<vector<string>> exclude,
-        optional<int64_t> daily_quota)
+        string display_name,
+        vector<string> accounts,
+        vector<string> include,
+        vector<string> exclude,
+        int64_t daily_quota)
     {
         auto itr = _pools.find(pool_name.value);
         check(itr != _pools.end(), "no such pool");
         require_auth(itr->owner);
         _pools.modify(itr, itr->owner, [&](pool& pool) {
-            if (display_name.has_value()) {
-                pool.display_name = *display_name;
-                check(pool.display_name.length() < 40, "display name too long");
-                check(pool.display_name.find_first_not_of("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890 %(),.:") == string::npos, "invalid character in display name");
-            }
-            if (accounts.has_value()) {
-                pool.accounts = *accounts;
-            }
-            if (include.has_value()) {
-                pool.include = *include;
-            }
-            if (exclude.has_value()) {
-                pool.exclude = *exclude;
-            }
-            if (daily_quota) {
-                pool.daily_quota = *daily_quota;
-                check(pool.daily_quota >= 0, "daily quota must not be negative");
-            }
+            pool.display_name = display_name;
+            check(pool.display_name.length() < 40, "display name too long");
+            check(pool.display_name.find_first_not_of("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890 !?#%(),.:") == string::npos, "invalid character in display name");
+            pool.accounts = accounts;
+            pool.include = include;
+            pool.exclude = exclude;
+            pool.daily_quota = daily_quota;
+            check(pool.daily_quota >= 0, "daily quota must not be negative");
         });
     }
 
