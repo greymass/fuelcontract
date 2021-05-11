@@ -20,8 +20,7 @@ icon: https://raw.githubusercontent.com/greymass/fuelcontract/master/icons/creat
 
 {{owner}} creates a new Greymass Fuel credits pool called {{pool_name}}.
 
-The RAM used to store the pool configuration is owned by {{owner}} and can be
-released by removing the pool.
+The RAM used to store the pool configuration is owned by {{owner}} and can be released by removing the pool.
 
 <h1 class="contract">updatepool</h1>
 
@@ -35,7 +34,7 @@ icon: https://raw.githubusercontent.com/greymass/fuelcontract/master/icons/updat
 {{owner}} updates pool configuration of {{pool_name}}.
 
 {{#if_has_value display_name}}
-Pool display name set to "{{accounts}}".
+Pool display name set to {{accounts}}.
 {{/if_has_value}}
 
 {{#if_has_value accounts}}
@@ -63,7 +62,6 @@ summary: 'Create a new credits pool called {{nowrap pool_name}}'
 icon: https://raw.githubusercontent.com/greymass/fuelcontract/master/icons/removepool.png#dda001e5100b42771c231dbeac533946fd6fcb3a10358197cae7ac42fea62430
 ---
 
-{{owner}} removes the Greymass Fuel credits pool called {{pool_name}}.
-Any unspent credits still in the pool will be forefit.
+{{owner}} removes the Greymass Fuel credits pool called {{pool_name}}. Any unspent credits still in the pool will be forfeit.
 
 The RAM used to store the pool configuration will be released to {{owner}}.
